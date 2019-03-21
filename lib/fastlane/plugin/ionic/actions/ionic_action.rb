@@ -204,9 +204,6 @@ module Fastlane
             description: "Add custom plugin for platform",
             is_string: true,
             default_value: '',
-            verify_block: proc do |value|
-              UI.user_error!("Custom plugin for platform should be either android, ios or url") unless [':url', 'android', 'ios'].include? value
-            end
           ),                    
           FastlaneCore::ConfigItem.new(
             key: :release,
