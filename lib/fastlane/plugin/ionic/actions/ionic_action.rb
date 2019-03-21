@@ -88,6 +88,16 @@ module Fastlane
         end
       end
 
+      # remove and add platform
+      def self.initialize_platform(params)
+        platform = params[:platform]
+        platform_custom = params[:platform_custom]
+        if platform && platform_custom
+          sh "ionic cordova platform remove #{platform}"
+          sh "ionic cordova platform add #{platform_custom}  --no-interative"
+        end
+      end
+
       # app_name
       def self.get_app_name
         config = REXML::Document.new(File.open('config.xml'))
@@ -145,9 +155,13 @@ module Fastlane
       end
 
       def self.run(params)
-        self.check_platform(params)
-        self.build(params)
-        self.set_build_paths(params[:release])
+        if params[:initialize] && params[:platform_custom]
+          self.initialize_platform(params)
+        else 
+          self.check_platform(params)
+          self.build(params)
+          self.set_build_paths(params[:release])
+        end
       end
 
       #####################################################
@@ -174,6 +188,26 @@ module Fastlane
               UI.user_error!("Platform should be either android or ios") unless ['', 'android', 'ios'].include? value
             end
           ),
+          FastlaneCore::ConfigItem.new(
+            key: :initialize,
+            env_name: "CORDOVA_INITIALIZE",
+            description: "Remove and add platform",
+            is_string: false,
+            default_value: false,
+            verify_block: proc do |value|
+              UI.user_error!("Initialize should be boolean") unless [false, true].include? value
+            end
+          ),    
+          FastlaneCore::ConfigItem.new(
+            key: :platform_custom,
+            env_name: "CORDOVA_PLATFORM_CUSTOM",
+            description: "Add custom plugin for platform",
+            is_string: string,
+            default_value: '',
+            verify_block: proc do |value|
+              UI.user_error!("Custom plugin for platform should be either android, ios or url") unless [':url', 'android', 'ios'].include? value
+            end
+          ),                    
           FastlaneCore::ConfigItem.new(
             key: :release,
             env_name: "CORDOVA_RELEASE",
