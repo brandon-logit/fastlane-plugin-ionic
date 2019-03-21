@@ -202,7 +202,7 @@ module Fastlane
             key: :platform_custom,
             env_name: "CORDOVA_PLATFORM_CUSTOM",
             description: "Add custom plugin for platform",
-            is_string: string,
+            is_string: true,
             default_value: '',
             verify_block: proc do |value|
               UI.user_error!("Custom plugin for platform should be either android, ios or url") unless [':url', 'android', 'ios'].include? value
